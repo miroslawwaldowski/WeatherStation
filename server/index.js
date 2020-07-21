@@ -1,9 +1,13 @@
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const pool = require("./db");
+const pool = require("./db/db");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const port = process.env.PORT;
+
 
 //middlewere
 
@@ -23,23 +27,21 @@ app.post("/post", async (req, res) => {
     );
     if (foundDevice.rows.length === 0) {
       res.json({ message: "Invalid Device" });
-    }
-
-    const hashedPassword = await bcrypt.compare(
-      req.body.password,
-      foundDevice.rows[0].hashed_password
-    );
-    if (hashedPassword === false) {
-      res.json({ message: "Invalid Password" });
     } else {
-      const { temperature, humidity } = req.body;
-      console.log(temperature + " " + humidity);
-      const weatherdata = await pool.query(
-        "INSERT INTO weatherdata (temperature, time_stamp, humidity) VALUES($1, now(), $2) RETURNING *",
-        [temperature, humidity]
+      const validPassword = await bcrypt.compare(
+        req.body.password,
+        foundDevice.rows[0].hashed_password
       );
-      res.json(weatherdata.rows[0]);
-      console.log(weatherdata.rows[0]);
+      if (validPassword === false) {
+        res.json({ message: "Invalid Password" });
+      } else {
+        const { temperature, humidity } = req.body;
+        const weatherdata = await pool.query(
+          "INSERT INTO weatherdata (temperature, time_stamp, humidity) VALUES($1, now(), $2) RETURNING *",
+          [temperature, humidity]
+        );
+        res.json(weatherdata.rows[0]);
+      }
     }
   } catch (err) {
     console.log(err.massage);
@@ -75,6 +77,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.listen(5000, () => {
-  console.log("server has started on port 5000");
+app.listen(port, () => {
+  console.log(`server has started on port ${port}`);
 });
