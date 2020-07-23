@@ -5,11 +5,16 @@
 dht DHT22;
 
 #define DEBUG true
-String ssid = "PLAY_ONLINE_2212";
-String password = "Zacisze1a5";
 
-String server = "192.168.0.105";
+String ssid = "*********";
+String password = "*********";
+
+String device_name = "*********";
+String server_password = "*********";
+
+String server = "*********";
 String port = "5000";
+String url = "/post";
 
 SoftwareSerial EspSerial(2, 3); // RX, TX
 
@@ -17,11 +22,11 @@ void setup()
 {
     Serial.begin(9600);
     EspSerial.begin(9600);
-    String conecting = "AT+CWJAP_CUR=\"" + ssid + "\",\"" + password + "\"\r\n";
 
-    sendData("AT\r\n", 1000, DEBUG); //status
-    //sendData("AT+CWLAP\r\n",5000,DEBUG); // lists all available APs.
-    sendData(conecting, 4000, DEBUG);
+    sendData("AT+RST\r\n", 2000, DEBUG); //restart
+
+    String conecting = "AT+CWJAP_CUR=\"" + ssid + "\",\"" + password + "\"\r\n";
+    sendData(conecting, 6000, DEBUG);
 }
 
 void loop()
@@ -52,10 +57,17 @@ void loop()
         break;
     }
 
-    String test = "AT+CIPSTART=\"TCP\",\"" + server + "\"," + port + "\r\n";
-    // sendData(test,2000,DEBUG);
+    String cmd = "AT+CIPSTART=\"TCP\",\"" + server + "\"," + port + "\r\n";
+    sendData(cmd, 1000, DEBUG);
+    String JSONdata = "{\"temperature\":" + String(temperature) + ",\"humidity\":" + String(humidity) + ",\"name\":\"" + device_name + "\",\"password\":\"" + server_password + "\"}";
+    String postcmd = "POST " + url + " HTTP/1.1\r\nHost: " + server + ":" + port + "\r\n" +
+                     "Accept: *" + "/" + "*\r\nContent-Length: " + JSONdata.length() + "\r\n" +
+                     "Content-Type: application/json;charset=UTF-8\r\n\r\n" + JSONdata;
 
-    delay(10000);
+    sendData("AT+CIPSEND=" + String(postcmd.length()) + "\r\n", 1000, DEBUG);
+    sendData(postcmd, 2000, DEBUG);
+
+    delay(60000);
 }
 
 String sendData(String command, int timeout, boolean debug)
