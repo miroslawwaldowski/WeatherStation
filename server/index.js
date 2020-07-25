@@ -8,7 +8,6 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const port = process.env.PORT;
 
-
 //middlewere
 
 app.use(cors());
@@ -35,10 +34,9 @@ app.post("/post", async (req, res) => {
       if (validPassword === false) {
         res.json({ message: "Invalid Password" });
       } else {
-        const { temperature, humidity } = req.body;
         const weatherdata = await pool.query(
           "INSERT INTO weatherdata (temperature, time_stamp, humidity) VALUES($1, now(), $2) RETURNING *",
-          [temperature, humidity]
+          [req.body.temperature, req.body.humidity]
         );
         res.json(weatherdata.rows[0]);
       }
@@ -53,14 +51,13 @@ app.post("/post", async (req, res) => {
 app.post("/devices", async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-    const name = req.body.name;
-    console.log(hashedPassword + " " + name);
+  //  console.log(hashedPassword + " " + name);
     const devices = await pool.query(
       "INSERT INTO devices (name_device, hashed_password) VALUES($1, $2) RETURNING *",
-      [name, hashedPassword]
+      [req.body.name, hashedPassword]
     );
     res.json(devices.rows[0]);
-    console.log(devices.rows[0]);
+  //  console.log(devices.rows[0]);
   } catch (err) {
     console.log(err.massage);
   }
@@ -72,6 +69,17 @@ app.get("/", async (req, res) => {
   try {
     const all = await pool.query("SELECT * FROM weatherdata");
     res.json(all.rows);
+  } catch (err) {
+    console.log(err.massage);
+  }
+});
+
+//get last
+
+app.get("/last", async (req, res) => {
+  try {
+    const last = await pool.query("SELECT id,to_char(time_stamp, 'YYYY-MON-DD HH24:MI')time_stamp, temperature, humidity FROM weatherdata ORDER BY time_stamp DESC LIMIT 1;");
+    res.json(last.rows);
   } catch (err) {
     console.log(err.massage);
   }
