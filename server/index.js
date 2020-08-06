@@ -78,7 +78,7 @@ app.get("/", async (req, res) => {
 
 app.get("/last", async (req, res) => {
   try {
-    const last = await pool.query("SELECT id,to_char(time_stamp, 'YYYY-MON-DD HH24:MI')time_stamp, temperature, humidity FROM weatherdata ORDER BY time_stamp DESC LIMIT 1;");
+    const last = await pool.query("SELECT id,to_char(time_stamp, 'YYYY-MON-DD  HH24:MI')time_stamp, temperature, humidity FROM weatherdata ORDER BY id DESC LIMIT 1;");
     res.json(last.rows);
   } catch (err) {
     console.log(err.massage);
