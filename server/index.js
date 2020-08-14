@@ -83,7 +83,7 @@ app.get("/", async (req, res) => {
       type = type.substring(1);
     };
 
-    const sql = `SELECT ${type} FROM weatherdata ORDER BY id DESC LIMIT ${limit}`
+    const sql = `SELECT ${type} FROM weatherdata ORDER BY time_stamp DESC LIMIT ${limit}`
     const all = await pool.query(sql);
     res.json(all.rows);
   } catch (err) {

@@ -1,10 +1,11 @@
 import React from "react";
+import Map from "./Map"
 
 const DateDetail = () => {
   return (
-    <div class="grid-item" id="date-detail">
-      date-detail-component
-    </div>
+      <div className="grid-item" id="date-detail">
+        <Map/>
+      </div>
   );
 };
 

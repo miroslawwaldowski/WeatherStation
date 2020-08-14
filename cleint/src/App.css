@@ -34,6 +34,33 @@ html, body {
   height: var(--grid-item-height);
 }
 
+.map-marker {
+  color:#CACACA;
+  background-color: rgba(40, 44, 49,0.5);  
+  border: 1px solid #4D4D4D;
+  border-radius: 50%;
+  width: 10vh;
+  height: 10vh;
+}
+
+.map-container{
+  position: absolute;
+  margin: auto;
+  width:90%;
+  height: 90%;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.map-parent-container{
+  width:100%;
+  height: 100%;
+  position: relative;
+}
+
+
+
 #date {order: 1;}
 #date-detail {order: 2;}
 #temp {order: 3;}
