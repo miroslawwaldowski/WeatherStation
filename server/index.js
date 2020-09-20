@@ -64,7 +64,7 @@ app.post("/devices", async (req, res) => {
 
 
 //get 
-//?limit=5&type[]=id&type[]=temperature&type[]=time_stamp&type[]=humidity
+//?limit=5&time=2020-07-20 21:26:24.334931&type[]=id&type[]=temperature&type[]=time_stamp&type[]=humidity
 
 app.get("/", async (req, res) => {
   try {
@@ -72,6 +72,11 @@ app.get("/", async (req, res) => {
     if(req.query.limit){
       limit = req.query.limit     
     };
+
+    var time = new Date('January 1, 1970 00:00:01').toISOString()
+    if (req.query.time){
+      time = req.query.time
+    }
 
     var type = "*"
     if(req.query.type){
@@ -83,7 +88,7 @@ app.get("/", async (req, res) => {
       type = type.substring(1);
     };
 
-    const sql = `SELECT ${type} FROM weatherdata ORDER BY time_stamp DESC LIMIT ${limit}`
+    const sql = `SELECT ${type} FROM weatherdata WHERE time_stamp > '${time}' ORDER BY time_stamp DESC LIMIT ${limit}`
     const all = await pool.query(sql);
     res.json(all.rows);
   } catch (err) {
