@@ -6,7 +6,6 @@ const cors = require("cors");
 const pool = require("./db/db");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const port = process.env.PORT;
 
 //middlewere
 
@@ -153,6 +152,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`server has started on port ${port}`);
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`server has started on port ${process.env.PORT}`);
 });
