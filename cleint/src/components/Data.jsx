@@ -35,8 +35,6 @@ const Data = () => {
       );
       const [jsonData] = await response.json();
       setDataset(jsonData);
-      console.log(dataset.time_stamp)
-      console.log(new Date(dataset.time_stamp).toLocaleTimeString())
       setLoading(false);
     };
     getData();
