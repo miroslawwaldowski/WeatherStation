@@ -1,6 +1,3 @@
--- list of timezones in file txt
-SET TIMEZONE='Europe/Warsaw';  
-
 CREATE DATABASE weatherstation;
 
 CREATE TABLE devices
@@ -15,14 +12,13 @@ CREATE TABLE weatherdata
   id serial PRIMARY KEY,
   device_id INTEGER REFERENCES devices (id), 
   time_stamp TIMESTAMP,
-  temperature NUMERIC (4, 1),
-  humidity NUMERIC (4, 1),
+  temperature NUMERIC(4,1),
+  humidity NUMERIC(4,1),
   uv smallint,
-  pressure NUMERIC (5, 0),
-  pm10 NUMERIC (4, 0),
-  pm25 NUMERIC (4, 0),
-  latitude NUMERIC (6, 4),
-  longitude NUMERIC (7, 4),
-  battery NUMERIC (4, 0),
+  pressure NUMERIC(5,0),
+  pm10 NUMERIC(4,0),
+  pm25 NUMERIC(4,0),
+  latitude NUMERIC(6,4),
+  longitude NUMERIC(7,4),
+  battery NUMERIC(4,0)
 );
-
