@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 
 const startDate = new Date();
-startDate.setDate(startDate.getDate() - 7);
+startDate.setDate(startDate.getDate() - 7); //set range date at week
 
 const Chart = (props) => {
   const [dataset, setDataset] = useState([]);
@@ -11,9 +11,22 @@ const Chart = (props) => {
     limit: startDate.toISOString(),
   });
 
+  var windowSize = window.innerWidth;
+
   var date = new Date();
   var maxDate = new Date();
   var minDate = new Date();
+
+  if (dataset.length > 0) {
+    for (let j = 0; j < dataset.length; j++) {
+      if (dataset[j][props.dataType] !== null) {
+        date = new Date(dataset[j].time_stamp);
+        maxDate = new Date(dataset[j].time_stamp);
+        minDate = new Date(dataset[j].time_stamp);
+        break;
+      }
+    }
+  }
 
   const handleSelectChange = (event) => {
     const value = event.target.value;
@@ -34,7 +47,7 @@ const Chart = (props) => {
   useEffect(() => {
     const getData = async () => {
       const response = await fetch(
-        `http://192.168.0.105:5000/?time=${chartTime.limit}&type[]=${props.dataType}&type[]=time_stamp`
+        `${process.env.REACT_APP_SERVER_URL}/?time=${chartTime.limit}&type[]=${props.dataType}&type[]=time_stamp`
       );
       const jsonData = await response.json();
       setDataset(jsonData);
@@ -42,53 +55,232 @@ const Chart = (props) => {
     getData();
   }, [chartTime.limit, props.dataType]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      // eslint-disable-next-line
+      windowSize = window.innerWidth;
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  });
+
   //for chart data
 
   const chartTicks = [];
   const chartPoints = [];
   var datasetFile = [];
 
-  //  48 points in 24 hour - 1 point in 30min
   const dailyChartPoints = () => {
-    datasetFile = [...dataset];
-
-    for (let i = 0; i < 48; i++) {
-      if (i === 0) {
-        minDate.setMinutes(minDate.getMinutes() - 30);
-      } else {
-        maxDate.setMinutes(maxDate.getMinutes() - 30);
-        minDate.setMinutes(minDate.getMinutes() - 30);
-      }
-      for (let j = 0; j < dataset.length; j++) {
-        if (new Date(dataset[j].time_stamp) > maxDate) {
-          dataset.shift();
-          j--;
-        } else if (
-          new Date(dataset[j].time_stamp) <= maxDate &&
-          new Date(dataset[j].time_stamp) > minDate
-        ) {
-          chartTicks[i] = new Date(dataset[j].time_stamp).toLocaleTimeString();
-          chartPoints[i] = dataset[j].temperature;
-          break;
-        } else {
+    if (dataset.length > 0) {
+      datasetFile = [...dataset];
+      //  48 points in 24 hour - 1 point in 30min
+      if (chartTime.name === "daily") {
+        for (let i = 0; i < 48; i++) {
+          if (i === 0) {
+            minDate.setMinutes(minDate.getMinutes() - 30);
+          } else {
+            maxDate.setMinutes(maxDate.getMinutes() - 30);
+            minDate.setMinutes(minDate.getMinutes() - 30);
+          }
           chartTicks[i] = maxDate.toLocaleTimeString();
+          chartPoints[i] = null;
+
+          for (let j = 0; j < dataset.length; j++) {
+            if (new Date(dataset[j].time_stamp) > maxDate) {
+              dataset.shift();
+              j--;
+            } else if (
+              new Date(dataset[j].time_stamp) <= maxDate &&
+              new Date(dataset[j].time_stamp) > minDate
+            ) {
+              chartTicks[i] = new Date(
+                dataset[j].time_stamp
+              ).toLocaleTimeString();
+              chartPoints[i] = dataset[j][props.dataType];
+              break;
+            } else {
+              break;
+            }
+          }
+        }
+        //  84 points in 7 days - 1 point in 2h
+      } else if (chartTime.name === "weekly") {
+        for (let i = 0; i < 84; i++) {
+          if (i === 0) {
+            minDate.setHours(minDate.getHours() - 2);
+          } else {
+            maxDate.setHours(maxDate.getHours() - 2);
+            minDate.setHours(minDate.getHours() - 2);
+          }
+          chartTicks[i] = maxDate.toLocaleDateString();
+          chartPoints[i] = null;
+
+          for (let j = 0; j < dataset.length; j++) {
+            if (new Date(dataset[j].time_stamp) > maxDate) {
+              dataset.shift();
+              j--;
+            } else if (
+              new Date(dataset[j].time_stamp) <= maxDate &&
+              new Date(dataset[j].time_stamp) > minDate
+            ) {
+              chartTicks[i] = new Date(
+                dataset[j].time_stamp
+              ).toLocaleDateString();
+              chartPoints[i] = dataset[j][props.dataType];
+              break;
+            } else {
+              break;
+            }
+          }
+        }
+      } else if (chartTime.name === "monthly") {
+        //  60 points in 1 month - 2 point in 1d
+        for (let i = 0; i < 60; i++) {
+          var minValue;
+
+          //set range
+          if (i === 0) {
+            maxDate.setMinutes(0);
+            maxDate.setSeconds(0);
+            minDate.setMinutes(0);
+            minDate.setSeconds(0);
+            // between 20 and 8
+            if (maxDate.getHours() < 8) {
+              maxDate.setHours(8);
+              minDate.setDate(minDate.getDate() - 1);
+              minDate.setHours(20);
+              minValue = true;
+              // between 8 and 20
+            } else if (maxDate.getHours() >= 8 && maxDate.getHours() < 20) {
+              maxDate.setHours(20);
+              minDate.setHours(8);
+              minValue = false;
+              // between 20 and 8
+            } else {
+              maxDate.setDate(maxDate.getDate() + 1);
+              maxDate.setHours(8);
+              minDate.setHours(20);
+              minValue = true;
+            }
+          } else {
+            maxDate.setHours(maxDate.getHours() - 12);
+            minDate.setHours(minDate.getHours() - 12);
+            minValue = !minValue;
+          }
+          chartTicks[i] = maxDate.toLocaleDateString();
+          chartPoints[i] = null;
+          for (let j = 0; j < dataset.length; j++) {
+            if (new Date(dataset[j].time_stamp) > maxDate) {
+              dataset.shift();
+              j--;
+            } else if (
+              new Date(dataset[j].time_stamp) <= maxDate &&
+              new Date(dataset[j].time_stamp) > minDate
+            ) {
+              if (minValue) {
+                // search min value in date range
+                if (chartPoints[i] === null) {
+                  chartTicks[i] = new Date(
+                    dataset[j].time_stamp
+                  ).toLocaleDateString();
+                  chartPoints[i] = dataset[j][props.dataType];
+                } else if (chartPoints[i] > dataset[j][props.dataType]) {
+                  chartTicks[i] = new Date(
+                    dataset[j].time_stamp
+                  ).toLocaleDateString();
+                  chartPoints[i] = dataset[j][props.dataType];
+                }
+              } else {
+                // search max value in date range
+                if (chartPoints[i] < dataset[j][props.dataType]) {
+                  chartTicks[i] = new Date(
+                    dataset[j].time_stamp
+                  ).toLocaleDateString();
+                  chartPoints[i] = dataset[j][props.dataType];
+                }
+              }
+            } else {
+              break;
+            }
+          }
+        }
+      } else if (chartTime.name === "yearly") {
+        //  182 points in 1 year - 1 point in 2d
+        for (let i = 0; i < 182; i++) {
+          if (i === 0) {
+            minDate.setDate(minDate.getDate() - 2);
+          } else {
+            maxDate.setDate(maxDate.getDate() - 2);
+            minDate.setDate(minDate.getDate() - 2);
+          }
+          chartTicks[i] = maxDate.toLocaleDateString();
+          chartPoints[i] = null;
+
+          for (let j = 0; j < dataset.length; j++) {
+            if (new Date(dataset[j].time_stamp) > maxDate) {
+              dataset.shift();
+              j--;
+            } else if (
+              new Date(dataset[j].time_stamp) <= maxDate &&
+              new Date(dataset[j].time_stamp) > minDate
+            ) {
+              // search max value in date range
+              if (chartPoints[i] < dataset[j][props.dataType]) {
+                chartTicks[i] = new Date(
+                  dataset[j].time_stamp
+                ).toLocaleDateString();
+                chartPoints[i] = dataset[j][props.dataType];
+              }
+            } else {
+              break;
+            }
+          }
+        }
+      } else {
+        //difference between firt day and now in days
+        const daysRange = Math.floor(
+          (maxDate.getTime() -
+            new Date(dataset[dataset.length - 1].time_stamp).getTime()) /
+            (1000 * 3600 * 24)
+        );
+        const daysShift = Math.ceil(daysRange / 182);
+        //  182 points in max range
+        for (let i = 0; i < 182; i++) {
+          if (i === 0) {
+            minDate.setDate(minDate.getDate() - daysShift);
+          } else {
+            maxDate.setDate(maxDate.getDate() - daysShift);
+            minDate.setDate(minDate.getDate() - daysShift);
+          }
+          chartTicks[i] = maxDate.toLocaleDateString();
+          chartPoints[i] = null;
+          for (let j = 0; j < dataset.length; j++) {
+            if (new Date(dataset[j].time_stamp) > maxDate) {
+              dataset.shift();
+              j--;
+            } else if (
+              new Date(dataset[j].time_stamp) <= maxDate &&
+              new Date(dataset[j].time_stamp) > minDate
+            ) {
+              // search max value in date range
+              if (chartPoints[i] < dataset[j][props.dataType]) {
+                chartTicks[i] = new Date(
+                  dataset[j].time_stamp
+                ).toLocaleDateString();
+                chartPoints[i] = dataset[j][props.dataType];
+              }
+            } else {
+              break;
+            }
+          }
         }
       }
     }
   };
 
-  for (let i = 0; i < dataset.length; i = i + 1) {
-    if (chartTime.name === "daily") {
-      dailyChartPoints();
-    } else {
-      chartTicks[i] = new Date(dataset[i].time_stamp).toLocaleDateString();
-    }
-    if (props.dataType === "temperature") {
-      //chartPoints[i] = dataset[i].temperature;
-    } else {
-      chartPoints[i] = dataset[i].humidity;
-    }
-  }
+  dailyChartPoints();
 
   const data = {
     labels: chartTicks,
@@ -100,7 +292,7 @@ const Chart = (props) => {
         borderColor: "#CACACA",
         borderWidth: 2,
         pointRadius: 3,
-        pointHitRadius: 10,
+        pointHitRadius: 13,
         data: chartPoints,
       },
     ],
@@ -140,14 +332,13 @@ const Chart = (props) => {
     <div className="chart-parent-container">
       <div className="chart-child-container">
         <div className="titel-container">
-          {props.dataType.charAt(0).toUpperCase() + props.dataType.slice(1)}{" "}
-          Details
+          <p>{props.title}</p>
         </div>
         <div className="chart-parameters">
           <div>
             <button
               className="btn"
-              onClick={dataset.length > 0 ? getCSV : undefined}
+              onClick={datasetFile.length > 0 ? getCSV : undefined}
             >
               Downland
             </button>
@@ -212,6 +403,7 @@ const Chart = (props) => {
           <Line
             data={data}
             options={{
+              showLines: false,
               maintainAspectRatio: false,
               legend: { display: false },
               layout: {
@@ -229,7 +421,8 @@ const Chart = (props) => {
                     ticks: {
                       fontColor: "#CACACA",
                       fontFamily: "Arial, Helvetica, sans-serif",
-                      fontSize: 12,
+                      fontSize:
+                        windowSize > 890 ? 13 : windowSize > 439 ? 10 : 9,
                       fontStyle: "bold",
                       maxTicksLimit: 5,
                     },
@@ -246,7 +439,8 @@ const Chart = (props) => {
                     ticks: {
                       fontColor: "#CACACA",
                       fontFamily: "Arial, Helvetica, sans-serif",
-                      fontSize: 12,
+                      fontSize:
+                        windowSize > 890 ? 12 : windowSize > 439 ? 8 : 6,
                       fontStyle: "bold",
                       maxTicksLimit: 5,
                       reverse: true,

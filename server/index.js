@@ -12,7 +12,7 @@ const port = process.env.PORT;
 
 app.use(cors());
 app.use(express.json()); //req.body
-app.use((req, res, next) => setTimeout(next, Math.random() * 1000)); // add  latency
+/// app.use((req, res, next) => setTimeout(next, Math.random() * 1000)); // add  latency
 
 //routs//
 app.set("query parser", "simple");

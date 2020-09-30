@@ -18,7 +18,7 @@ const CenterDate = (props) => {
   useEffect(() => {
     const getData = async () => {
       setLoading(true);
-      const response = await fetch("http://192.168.0.105:5000/devices");
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/devices`);
       const jsonData = await response.json();
       setOptions(jsonData);
       setLoading(false);
@@ -32,7 +32,7 @@ const CenterDate = (props) => {
         <DeviceForm setAddDeviceForm={(value) => setAddDeviceForm(value)} setSelectRender={(value) => setSelectRender(value)} />
       ) : (
         <>
-          <div className="center-half-container" onClick={props.onClick}>
+          <div className="center-half-container" id="battery" onClick={props.onClick}>
             <CardTitle title={"Battery"} />
             <div className="center-data-container">
               <p>
@@ -48,10 +48,10 @@ const CenterDate = (props) => {
               </p>
             </div>
           </div>
-          <div className="center-half-container">
+          <div className="center-half-container"id="device">
             <CardTitle title={"Device"} />
             <div className="center-data-container">
-              <>
+              <p>
                 {options === undefined ? (
                   "no data"
                 ) : loading ? (
@@ -68,10 +68,10 @@ const CenterDate = (props) => {
                     ))}
                   </select> :null
                 )}<br />
-                <button className="btn" onClick={() => {setSelectRender(false);setAddDeviceForm(true)}}>
-                  Add Device
+                <button className="btn" id="btn-device" onClick={() => {setSelectRender(false);setAddDeviceForm(true)}}>
+                  Add new device
                 </button>
-              </>
+              </p>
             </div>
           </div>
         </>

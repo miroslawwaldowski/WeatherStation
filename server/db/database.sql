@@ -1,3 +1,6 @@
+-- list of timezones in file txt
+SET TIMEZONE='Europe/Warsaw';  
+
 CREATE DATABASE weatherstation;
 
 CREATE TABLE devices

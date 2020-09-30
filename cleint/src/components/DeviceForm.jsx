@@ -19,7 +19,7 @@ const DeviceForm = (props) => {
     };
 
     const response = await fetch(
-      `http://192.168.0.105:5000/devices`,
+      `${process.env.REACT_APP_SERVER_URL}/devices`,
       requestOptions
     );
 
@@ -57,7 +57,7 @@ const DeviceForm = (props) => {
   };
 
   return (
-    <>
+    <div className="device-form-data-container-wrapper">
       <CardTitle title={"Add Device"} />
       <div className="device-form-data-container">
         <input
@@ -84,14 +84,14 @@ const DeviceForm = (props) => {
           onChange={handleConfirmPaswordChange}
         />
         <br />
-        <button className="btn" onClick={handleSubmit}>
+        <button className="btn" id="btn-device2" onClick={handleSubmit}>
           Add
         </button>
-        <button className="btn" onClick={() => {props.setSelectRender(true); props.setAddDeviceForm(false)}}>
+        <button className="btn" id="btn-device2" onClick={() => {props.setSelectRender(true); props.setAddDeviceForm(false)}}>
           Cancel
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

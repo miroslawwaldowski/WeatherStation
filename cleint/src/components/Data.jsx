@@ -7,11 +7,17 @@ import CardData from "./CardData";
 import LeftDate from "./LeftDate";
 import CenterDate from "./CenterDate";
 import RightDate from "./RightDate";
+import PressDetail from "./PressDetail";
+import UVDetail from "./UVDetail";
+import Pm10Detail from "./Pm10Detail";
+import Pm25Detail from "./Pm25Detail";
 
 const Data = () => {
   const [dataset, setDataset] = useState({});
   const [loading, setLoading] = useState(false);
   const [deviceId, setDeviceId] = useState(1);
+
+  const [newData, setNewData] = useState(false);
 
   const [dateDetail, setDateDetail] = useState(false);
   const [tempDetail, setTempDetail] = useState(false);
@@ -25,14 +31,33 @@ const Data = () => {
     const getData = async () => {
       setLoading(true);
       const response = await fetch(
-        `http://192.168.0.105:5000/?limit=1&device=${deviceId}`
+        `${process.env.REACT_APP_SERVER_URL}/?limit=1&device=${deviceId}`
       );
       const [jsonData] = await response.json();
       setDataset(jsonData);
+      console.log(dataset.time_stamp)
+      console.log(new Date(dataset.time_stamp).toLocaleTimeString())
       setLoading(false);
     };
     getData();
-  }, [deviceId]);
+  }, [deviceId, newData]);
+
+  //check every 10min if is new data
+  useEffect(() => {
+    const getNewData = setInterval(async () => {
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/?limit=1&device=${deviceId}&type[]=time_stamp`
+      );
+      const [jsonData] = await response.json();
+      if (dataset !== undefined) {
+        if (dataset.time_stamp === jsonData.time_stamp) {
+        } else {
+          setNewData(!newData);
+        }
+      }
+    }, 600000);
+    return () => clearInterval(getNewData);
+  }, [deviceId, dataset, newData]);
 
   const showDetail = (nameVal, val, setVal) => {
     const objectDetail = {
@@ -81,7 +106,15 @@ const Data = () => {
           onClick={() => showDetail("dateDetail", dateDetail, setDateDetail)}
         />
       </div>
-      {dateDetail ? <DateDetail /> : null}
+      {dateDetail ? (
+        <DateDetail
+          data={
+            dataset === undefined
+              ? null
+              : { latitude: dataset.latitude, longitude: dataset.longitude }
+          }
+        />
+      ) : null}
       <div
         className="grid-item"
         id="temp"
@@ -123,11 +156,7 @@ const Data = () => {
           unit={" hPa"}
         />
       </div>
-      {pressDetail ? (
-        <div className="grid-item" id="press-detail">
-          press-detail
-        </div>
-      ) : null}
+      {pressDetail ? <PressDetail /> : null}
       <div
         className="grid-item"
         id="uv"
@@ -141,11 +170,7 @@ const Data = () => {
           unit={""}
         />
       </div>
-      {uvDetail ? (
-        <div className="grid-item" id="uv-detail">
-          uv-detail
-        </div>
-      ) : null}
+      {uvDetail ? <UVDetail /> : null}
       <div
         className="grid-item"
         id="pm10"
@@ -159,11 +184,7 @@ const Data = () => {
           unit={" µg/m3"}
         />
       </div>
-      {pm10Detail ? (
-        <div className="grid-item" id="pm10-detail">
-          pm10-detail
-        </div>
-      ) : null}
+      {pm10Detail ? <Pm10Detail /> : null}
       <div
         className="grid-item"
         id="pm25"
@@ -177,11 +198,7 @@ const Data = () => {
           unit={" µg/m3"}
         />
       </div>
-      {pm25Detail ? (
-        <div className="grid-item" id="pm25-detail">
-          pm25-detail
-        </div>
-      ) : null}
+      {pm25Detail ? <Pm25Detail /> : null}
     </div>
   );
 };
