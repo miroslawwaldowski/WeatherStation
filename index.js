@@ -6,14 +6,13 @@ const cors = require("cors");
 const pool = require("./db/db");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const path = require('path');
+const path = require("path");
 
 //middlewere
 
 app.use(cors());
 app.use(express.json());
 /// app.use((req, res, next) => setTimeout(next, Math.random() * 1000)); // add  latency
-
 
 app.set("query parser", "simple");
 
@@ -50,6 +49,33 @@ app.post("/post", async (req, res) => {
       if (validPassword === false) {
         res.json({ message: "Invalid password" });
       } else {
+        if (!req.body.temperature) {
+          req.body.temperature = null;
+        }
+        if (!req.body.humidity) {
+          req.body.humidity = null;
+        }
+        if (!req.body.pressure) {
+          req.body.pressure = null;
+        }
+        if (!req.body.uv) {
+          req.body.uv = null;
+        }
+        if (!req.body.pm10) {
+          req.body.pm10 = null;
+        }
+        if (!req.body.pm25) {
+          req.body.pm25 = null;
+        }
+        if (!req.body.latitude) {
+          req.body.latitude = null;
+        }
+        if (!req.body.longitude) {
+          req.body.longitude = null;
+        }
+        if (!req.body.battery) {
+          req.body.battery = null;
+        }
         const sql = `SET TIMEZONE='${process.env.DB_TIMEZONE}'; INSERT INTO weatherdata (device_id, temperature, time_stamp, humidity, pressure, uv, pm10, pm25, latitude, longitude, battery) VALUES(${foundDevice.rows[0].id}, ${req.body.temperature}, now(), ${req.body.humidity}, ${req.body.pressure}, ${req.body.uv}, ${req.body.pm10}, ${req.body.pm25}, ${req.body.latitude}, ${req.body.longitude}, ${req.body.battery}) RETURNING *`;
         const weatherdata = await pool.query(sql);
         res.json({ message: "data added" });
@@ -142,15 +168,15 @@ app.get("/api", async (req, res) => {
 
 //get react app
 
-if (true //process.env.NODE_ENV === "production"
+if (
+  true //process.env.NODE_ENV === "production"
 ) {
-  app.use(express.static('client/build'));
+  app.use(express.static("client/build"));
 
   app.get("/", (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client','build','index.html'));
-  } );
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
 }
-
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`server has started on port ${process.env.PORT}`);
