@@ -49,35 +49,23 @@ app.post("/post", async (req, res) => {
       if (validPassword === false) {
         res.json({ message: "Invalid password" });
       } else {
-        if (!req.body.temperature) {
-          req.body.temperature = null;
-        }
-        if (!req.body.humidity) {
-          req.body.humidity = null;
-        }
-        if (!req.body.pressure) {
-          req.body.pressure = null;
-        }
-        if (!req.body.uv) {
-          req.body.uv = null;
-        }
-        if (!req.body.pm10) {
-          req.body.pm10 = null;
-        }
-        if (!req.body.pm25) {
-          req.body.pm25 = null;
-        }
-        if (!req.body.latitude) {
-          req.body.latitude = null;
-        }
-        if (!req.body.longitude) {
-          req.body.longitude = null;
-        }
-        if (!req.body.battery) {
-          req.body.battery = null;
-        }
-        const sql = `SET TIMEZONE='${process.env.DB_TIMEZONE}'; INSERT INTO weatherdata (device_id, temperature, time_stamp, humidity, pressure, uv, pm10, pm25, latitude, longitude, battery) VALUES(${foundDevice.rows[0].id}, ${req.body.temperature}, now(), ${req.body.humidity}, ${req.body.pressure}, ${req.body.uv}, ${req.body.pm10}, ${req.body.pm25}, ${req.body.latitude}, ${req.body.longitude}, ${req.body.battery}) RETURNING *`;
-        const weatherdata = await pool.query(sql);
+        const sql = `SET TIMEZONE='${process.env.DB_TIMEZONE}'`;
+        const timezone = await pool.query(sql);
+        const weatherdata = await pool.query(
+          "INSERT INTO weatherdata (device_id, temperature, time_stamp, humidity, pressure, uv, pm10, pm25, latitude, longitude, battery) VALUES($1, $2, now(), $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+          [
+            foundDevice.rows[0].id,
+            req.body.temperature,
+            req.body.humidity,
+            req.body.pressure,
+            req.body.uv,
+            req.body.pm10,
+            req.body.pm25,
+            req.body.latitude,
+            req.body.longitude,
+            req.body.battery,
+          ]
+        );     
         res.json({ message: "data added" });
       }
     }
