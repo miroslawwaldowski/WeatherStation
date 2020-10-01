@@ -142,7 +142,8 @@ app.get("/api", async (req, res) => {
 
 //get react app
 
-if (process.env.NODE_ENV === "production") {
+if (true //process.env.NODE_ENV === "production"
+) {
   app.use(express.static('client/build'));
 
   app.get("/", (req, res) => {
