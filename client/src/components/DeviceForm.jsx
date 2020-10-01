@@ -19,7 +19,7 @@ const DeviceForm = (props) => {
     };
 
     const response = await fetch(
-      `${process.env.REACT_APP_SERVER_URL}/devices`,
+      `/devices`,
       requestOptions
     );
 

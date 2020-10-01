@@ -47,7 +47,7 @@ const Chart = (props) => {
   useEffect(() => {
     const getData = async () => {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/api?time=${chartTime.limit}&type[]=${props.dataType}&type[]=time_stamp`
+        `/api?time=${chartTime.limit}&type[]=${props.dataType}&type[]=time_stamp`
       );
       const jsonData = await response.json();
       setDataset(jsonData);

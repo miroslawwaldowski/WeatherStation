@@ -18,7 +18,7 @@ const CenterDate = (props) => {
   useEffect(() => {
     const getData = async () => {
       setLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/devices`);
+      const response = await fetch(`/devices`);
       const jsonData = await response.json();
       setOptions(jsonData);
       setLoading(false);
