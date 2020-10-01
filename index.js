@@ -143,10 +143,10 @@ app.get("/api", async (req, res) => {
 //get react app
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static('cleint/build'));
+  app.use(express.static('client/build'));
 
   app.get("/", (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'cleint','build','index.html'));
+    res.sendFile(path.resolve(__dirname, 'client','build','index.html'));
   } );
 }
 
