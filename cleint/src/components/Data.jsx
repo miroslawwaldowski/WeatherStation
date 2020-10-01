@@ -31,7 +31,7 @@ const Data = () => {
     const getData = async () => {
       setLoading(true);
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/?limit=1&device=${deviceId}`
+        `${process.env.REACT_APP_SERVER_URL}/api?limit=1&device=${deviceId}`
       );
       const [jsonData] = await response.json();
       setDataset(jsonData);
@@ -44,7 +44,7 @@ const Data = () => {
   useEffect(() => {
     const getNewData = setInterval(async () => {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVER_URL}/?limit=1&device=${deviceId}&type[]=time_stamp`
+        `${process.env.REACT_APP_SERVER_URL}/api?limit=1&device=${deviceId}&type[]=time_stamp`
       );
       const [jsonData] = await response.json();
       if (dataset !== undefined) {
