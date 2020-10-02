@@ -49,8 +49,6 @@ app.post("/post", async (req, res) => {
       if (validPassword === false) {
         res.json({ message: "Invalid password" });
       } else {
-        const sql = `SET TIMEZONE='${process.env.DB_TIMEZONE}'`;
-        const timezone = await pool.query(sql);
         const weatherdata = await pool.query(
           "INSERT INTO weatherdata (device_id, temperature, time_stamp, humidity, pressure, uv, pm10, pm25, latitude, longitude, battery) VALUES($1, $2, now(), $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
           [
@@ -65,7 +63,7 @@ app.post("/post", async (req, res) => {
             req.body.longitude,
             req.body.battery,
           ]
-        );     
+        );
         res.json({ message: "data added" });
       }
     }
@@ -156,15 +154,11 @@ app.get("/api", async (req, res) => {
 
 //get react app
 
-if (
-  true //process.env.NODE_ENV === "production"
-) {
-  app.use(express.static("client/build"));
+app.use(express.static("client/build"));
 
-  app.get("/", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-  });
-}
+app.get("/", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+});
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`server has started on port ${process.env.PORT}`);
