@@ -105,7 +105,12 @@ app.post("/devices", async (req, res) => {
 
 app.get("/devices", async (req, res) => {
   try {
-    const sql = `SELECT id, name_device FROM devices`;
+    var limit = "NULL";
+    if (req.query.limit) {
+      limit = req.query.limit;
+    }
+
+    const sql = `SELECT id, name_device FROM devices LIMIT ${limit}`;
     const all = await pool.query(sql);
     res.json(all.rows);
   } catch (err) {

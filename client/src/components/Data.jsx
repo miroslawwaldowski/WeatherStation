@@ -13,12 +13,32 @@ import Pm10Detail from "./Pm10Detail";
 import Pm25Detail from "./Pm25Detail";
 
 const Data = () => {
+  const [firstDeviceId, setfirstDeviceId] = useState();
+  const [firstDeviceIdReady, setFirstDeviceIdReady] = useState(false);
+
+  useEffect(() => {
+    const getData = async () => {
+      const response = await fetch(`/devices?limit=1`);
+      const [jsonData] = await response.json();
+      setfirstDeviceId(jsonData);
+      setFirstDeviceIdReady(true);
+    };
+    getData();
+  }, []);
+
+  useEffect(() => {
+    if (firstDeviceIdReady) {
+      firstDeviceId === undefined
+        ? setDeviceId(0)
+        : setDeviceId(firstDeviceId.id);
+    }
+    // eslint-disable-next-line
+  }, [firstDeviceIdReady]);
+
   const [dataset, setDataset] = useState({});
   const [loading, setLoading] = useState(false);
-  const [deviceId, setDeviceId] = useState(1);
-
+  const [deviceId, setDeviceId] = useState();
   const [newData, setNewData] = useState(false);
-
   const [dateDetail, setDateDetail] = useState(false);
   const [tempDetail, setTempDetail] = useState(false);
   const [humiDetail, setHumiDetail] = useState(false);
@@ -30,9 +50,7 @@ const Data = () => {
   useEffect(() => {
     const getData = async () => {
       setLoading(true);
-      const response = await fetch(
-        `/api?limit=1&device=${deviceId}`
-      );
+      const response = await fetch(`/api?limit=1&device=${deviceId}`);
       const [jsonData] = await response.json();
       setDataset(jsonData);
       setLoading(false);
