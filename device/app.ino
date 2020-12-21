@@ -1,6 +1,6 @@
+#include <LowPower.h>
 #include <Wire.h>
 #include <cactus_io_BME280_I2C.h>
-#include <NovaSDS011.h>
 #include <SoftwareSerial.h>
 
 //dev
@@ -48,6 +48,8 @@ const char cip_apn[] PROGMEM = {"AT+CSTT="};
 const char cip_gprs[] PROGMEM = {"AT+CIICR"};
 const char cip_ip[] PROGMEM = {"AT+CIFSR"};
 const char cip_exit_config[] PROGMEM = {"AT+CIPSHUT"};
+const char sleep_gsm[] PROGMEM = {"AT+CSCLK=2"};
+const char wake_up_gsm[] PROGMEM = {"AT+CSCLK=0"};
 
 //AT Commands TCP
 const char start_TCP_connection[] PROGMEM = {"AT+CIPSTART=\"TCP\",\""};
@@ -76,6 +78,9 @@ const char HTML_POST_header_5[] PROGMEM = {"Content-Length: "};
 String r = "\r";
 String n = "\n";
 
+byte deviceId1 = 0xFF;
+byte deviceId2 = 0xFF;
+
 #define UV A7
 #define BATTERY A6
 #define SDS_PIN_RX 5
@@ -89,6 +94,7 @@ String n = "\n";
 #define WWW_PIN_RX 3
 #define WWW_PIN_TX 4
 #endif
+#define WIFIPOWER 9
 
 //measurement data
 float temperature;
@@ -103,26 +109,36 @@ int battery;
 
 // Create BME280 object
 BME280_I2C bme(0x76); // I2C using address 0x76
-// Create NovaSDS011 object
-NovaSDS011 sds011;
 // Create SoftwareSerial object
 SoftwareSerial WWWSerial(WWW_PIN_RX, WWW_PIN_TX);
+SoftwareSerial serialSDS(SDS_PIN_RX, SDS_PIN_TX);
 
 void setup()
 {
 
     analogReference(EXTERNAL);
+    pinMode(WIFIPOWER, OUTPUT);
+    digitalWrite(WIFIPOWER, LOW);
 
     bme.begin();
-    sds011.begin(SDS_PIN_RX, SDS_PIN_TX);
     Serial.begin(9600);
     WWWSerial.begin(9600);
-    Serial.println("end setup");
+    serialSDS.begin(9600);
+    delay(15000);
+    SetToQueryModeSDS();
+    SleepSDS();
+    sleepGSM(1000);
 }
 
 void loop()
 {
+    serialSDS.listen();
+    WakeUpSDS();
+    delay(35000);
+    dataSDSquery();
+    SleepSDS();
 
+    WWWSerial.listen();
     if (DEBUG)
     {
         memoryCheck();
@@ -132,20 +148,30 @@ void loop()
 
     if (GSM_MODE)
     {
+        wakeUpGSM(1000);
         testGSM(1000);
         GSM_location(2000);
         startTCPconnectionGSM(2000);
         sendOverTCP(2000);
         sendData(readFromFlash(cip_exit_config) + r + n, 1000, DEBUG);
+        wakeUpGSM(1000);
+        sleepGSM(1000);
     }
     else
     {
+        powerWiFiOn(true);
         resetWiFi(2000);
         connectWiFi(7000);
         startTCPconnection(1000);
         sendOverTCP(2000);
+        powerWiFiOn(false);
     }
-    delay(3600000);
+    for (int i = 0; i < 439; i++)
+    {
+        LowPower.idle(SLEEP_8S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF,
+                      SPI_OFF, USART0_OFF, TWI_OFF);
+        delay(50);
+    }
 }
 
 void sendData(String command, int timeout, boolean debug)
@@ -202,6 +228,15 @@ void testGSM(int timeout)
     sendData(readFromFlash(signal_test) + r + n, timeout, DEBUG);
     sendData(readFromFlash(network_test) + r + n, timeout, DEBUG);
 }
+void sleepGSM(int timeout)
+{
+    sendData(readFromFlash(sleep_gsm) + r + n, timeout, DEBUG);
+}
+void wakeUpGSM(int timeout)
+{
+    sendData(readFromFlash(handshake) + r + n, timeout, DEBUG);
+    sendData(readFromFlash(wake_up_gsm) + r + n, timeout, DEBUG);
+}
 void GSM_location(int timeout)
 {
     sendData(readFromFlash(close_bearer) + r + n, timeout, DEBUG);
@@ -226,6 +261,19 @@ void startTCPconnectionGSM(int timeout)
 
     String ATcommand = readFromFlash(start_TCP_connection) + readFromFlash(server) + "\"," + String(port) + r + n;
     sendData(ATcommand, timeout, DEBUG);
+}
+void powerWiFiOn(boolean on)
+{
+    if (on)
+    {
+        digitalWrite(WIFIPOWER, HIGH);
+        delay(2000);
+    }
+    else
+    {
+        digitalWrite(WIFIPOWER, LOW);
+        delay(2000);
+    }
 }
 
 void connectWiFi(int timeout)
@@ -312,7 +360,6 @@ void readSensors()
     pressure = bme.getPressure_MB();
     uv = readUV();
     battery = readBattery();
-    readSDS();
 }
 
 byte readUV()
@@ -372,12 +419,6 @@ int readBattery()
 {
     int value = analogRead(BATTERY);
     return (int)(((value * 5.0) / 1024.0) * 1000);
-}
-
-void readSDS()
-{
-
-    sds011.queryData(pm25, pm10);
 }
 
 String StringJSON_1()
@@ -494,4 +535,126 @@ void memoryCheck()
     Serial.println();
     FREERAM_PRINT;
     Serial.println();
+}
+//------Dust sensor functions---------------------------------------------------
+void QueryModeSDS()
+{
+    sendSDS(0x02, false, false);
+}
+void SetToQueryModeSDS()
+{
+    sendSDS(0x02, true, true);
+}
+void SetToActiveModeSDS()
+{
+    sendSDS(0x02, true, false);
+}
+void QuerySleepSDS()
+{
+    sendSDS(0x06, false, false);
+}
+void SleepSDS()
+{
+    sendSDS(0x06, false, true);
+}
+void WakeUpSDS()
+{
+    sendSDS(0x06, true, true);
+}
+void dataSDSquery()
+{
+    sendSDS(0x04, false, false);
+    Serial.println(pm25);
+    Serial.println(pm10);
+}
+void sendSDS(byte commandId, boolean condition, boolean activeMode)
+{
+    byte SDS_cmd[] = {0xAA, 0xB4, commandId, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, deviceId1, deviceId2, 0x00, 0xAB};
+    switch (commandId)
+    {
+    case (0x02): //set data mode
+        if (condition)
+        { // condition - true - set, false - query
+            SDS_cmd[3] = 0x01;
+        }
+        if (activeMode)
+        { // activeMode - true - active , false - query
+            SDS_cmd[4] = 0x01;
+        }
+        break;
+    case (0x06): //sleep -wakeup
+        if (activeMode)
+        { // activeMode - true - - active , false - query
+            SDS_cmd[3] = 0x01;
+        }
+        if (condition)
+        { // condition - true - wake up, false - sleep
+            SDS_cmd[4] = 0x01;
+        }
+        break;
+    }
+
+    int checksum = 0;
+    for (int i = 2; i <= 16; i++)
+    {
+        checksum = checksum + SDS_cmd[i];
+    }
+    checksum = checksum % 0x100;
+    SDS_cmd[17] = checksum;
+
+    if (DEBUG)
+    {
+        for (int i = 0; i < 19; i++)
+        {
+            Serial.print(SDS_cmd[i], HEX);
+            Serial.print(" ");
+        }
+        Serial.println(" ");
+    }
+    byte b;
+    int len = 0;
+    int value;
+    int pm10_serial = 0;
+    int pm25_serial = 0;
+    delay(100);
+    serialSDS.write(SDS_cmd, sizeof(SDS_cmd));
+    delay(100);
+    while (serialSDS.available() > 0)
+    {
+        b = serialSDS.read();
+        value = int(b);
+
+        if (DEBUG)
+        {
+            Serial.print(String(value, HEX) + " ");
+        }
+        if (commandId == 0x04)
+        {
+            switch (len)
+            {
+            case (2):
+                pm25_serial = value;
+                break;
+            case (3):
+                pm25_serial = pm25_serial + (value << 8);
+                break;
+            case (4):
+                pm10_serial = value;
+                break;
+            case (5):
+                pm10_serial = pm10_serial + (value << 8);
+                break;
+            }
+        }
+        len++;
+    }
+    if (DEBUG)
+    {
+        Serial.println("");
+    }
+    if (commandId == 0x04)
+    {
+        pm10 = (float)pm10_serial / 10.0;
+        pm25 = (float)pm25_serial / 10.0;
+    }
 }
