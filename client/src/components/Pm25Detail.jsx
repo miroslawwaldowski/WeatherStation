@@ -3,7 +3,7 @@ import Chart from "./Chart";
 
 const Pm25Detail = () => {
     return (
-        <div className="grid-item" id="uv-detail">
+        <div className="grid-item" id="pm25-detail">
         <Chart dataType={"pm25"} title={"PM 25 Detail"}/>
       </div>
     )
