@@ -1,6 +1,6 @@
 #include <LowPower.h>
 #include <Wire.h>
-#include <cactus_io_BME280_I2C.h>
+#include <Adafruit_BME280.h>
 #include <SoftwareSerial.h>
 
 //dev
@@ -23,6 +23,8 @@ const char gprs_apn[] PROGMEM = {"\"INTERNET\""};
 //device info
 const char device_name[] PROGMEM = {"prototyp"};
 const char server_password[] PROGMEM = {"haslo"};
+//device height above sea level in in meters
+int height_above_sea_level = 87;
 //---------------------------------------------------------------
 
 //AT Commands WIFI
@@ -96,6 +98,9 @@ byte deviceId2 = 0xFF;
 #endif
 #define WIFIPOWER 9
 
+#define ARRAY_SIZE 2
+#define ARRAY_WASTE 0
+
 //measurement data
 float temperature;
 float humidity;
@@ -108,7 +113,7 @@ float longitude;
 int battery;
 
 // Create BME280 object
-BME280_I2C bme(0x76); // I2C using address 0x76
+Adafruit_BME280 bme;
 // Create SoftwareSerial object
 SoftwareSerial WWWSerial(WWW_PIN_RX, WWW_PIN_TX);
 SoftwareSerial serialSDS(SDS_PIN_RX, SDS_PIN_TX);
@@ -120,7 +125,7 @@ void setup()
     pinMode(WIFIPOWER, OUTPUT);
     digitalWrite(WIFIPOWER, LOW);
 
-    bme.begin();
+    bme.begin(0x76);
     Serial.begin(9600);
     WWWSerial.begin(9600);
     serialSDS.begin(9600);
@@ -166,7 +171,7 @@ void loop()
         sendOverTCP(2000);
         powerWiFiOn(false);
     }
-    for (int i = 0; i < 439; i++)
+    for (int i = 0; i < 410; i++)
     {
         LowPower.idle(SLEEP_8S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF,
                       SPI_OFF, USART0_OFF, TWI_OFF);
@@ -354,12 +359,71 @@ String readFromFlash(char stringToRead[])
 
 void readSensors()
 {
-    bme.readSensor();
-    temperature = bme.getTemperature_C();
-    humidity = bme.getHumidity();
-    pressure = bme.getPressure_MB();
-    uv = readUV();
-    battery = readBattery();
+
+    // temperature - 0; humidity - 2; pressure - 1; uv - 3; battery - 4;
+    temperature = average(0);
+    humidity = average(2);
+    pressure = average(1);
+    uv = average(3);
+    battery = average(4);
+}
+
+// temperature - 0; humidity - 2; pressure; uv - 3; battery - 4;
+float average(byte value)
+{
+
+    float data_array[ARRAY_SIZE];
+    // reads
+    for (int i = 0; i < ARRAY_SIZE; i++)
+    {
+        switch (value)
+        {
+        case 0:
+            data_array[i] = bme.readTemperature();
+            break;
+        case 2:
+            data_array[i] = bme.readHumidity();
+            break;
+        case 3:
+            data_array[i] = readUV();
+            break;
+        case 4:
+            data_array[i] = readBattery();
+            break;
+        case 1:
+            float pressure_real = (bme.readPressure() / 100.0F);
+            data_array[i] = pressure_real + (height_above_sea_level / (8000 * ((1 + (0.004 * temperature)) / pressure_real)));
+            break;
+        }
+        delay(100);
+    }
+
+    //sort
+    sort(data_array, ARRAY_SIZE);
+
+    float result = 0;
+    for (int i = (ARRAY_WASTE / 2); i < ARRAY_SIZE - (ARRAY_WASTE / 2); i++)
+    {
+        result = result + data_array[i];
+    }
+    result = result / (ARRAY_SIZE - (ARRAY_WASTE));
+
+    return result;
+}
+void sort(float a[], int size)
+{
+    for (int i = 0; i < (size - 1); i++)
+    {
+        for (int o = 0; o < (size - (i + 1)); o++)
+        {
+            if (a[o] > a[o + 1])
+            {
+                float t = a[o];
+                a[o] = a[o + 1];
+                a[o + 1] = t;
+            }
+        }
+    }
 }
 
 byte readUV()
