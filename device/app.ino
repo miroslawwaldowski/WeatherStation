@@ -24,7 +24,7 @@ const char gprs_apn[] PROGMEM = {"\"INTERNET\""};
 const char device_name[] PROGMEM = {"prototyp"};
 const char server_password[] PROGMEM = {"haslo"};
 //device height above sea level in in meters
-int height_above_sea_level = 87;
+int height_above_sea_level = 80;
 //---------------------------------------------------------------
 
 //AT Commands WIFI
@@ -98,8 +98,8 @@ byte deviceId2 = 0xFF;
 #endif
 #define WIFIPOWER 9
 
-#define ARRAY_SIZE 2
-#define ARRAY_WASTE 0
+#define ARRAY_SIZE 14
+#define ARRAY_WASTE 4
 
 //measurement data
 float temperature;
@@ -171,7 +171,7 @@ void loop()
         sendOverTCP(2000);
         powerWiFiOn(false);
     }
-    for (int i = 0; i < 410; i++)
+    for (int i = 0; i < 409; i++)
     {
         LowPower.idle(SLEEP_8S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF,
                       SPI_OFF, USART0_OFF, TWI_OFF);
