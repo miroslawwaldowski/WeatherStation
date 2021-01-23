@@ -88,7 +88,7 @@ diagram związków encji ERD
 <img src="https://github.com/miroslawwaldowski/WeatherStation/blob/master/db/ERD.jpg" width="600" title="">
 </p>
 
-W pliku database.sql znajdują się polecenia sql generowania bazy danych.
+W pliku `database.sql` znajdują się polecenia sql generowania bazy danych.
 Przykład instalacja bazy danych na serwerze ElephantSQL znajduje się pod [tym linkiem](https://www.learmoreseekmore.com/2020/09/postgresql-elephantsql-cloudserv.html).
 
 ## Mapbox Token
