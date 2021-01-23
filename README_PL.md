@@ -47,13 +47,15 @@ index.js, app.js	| Aplikacja serwerowa Node JS
 
 ## Uwagi do elementów urządzenia
 
-Moduł SIM800L EVB: z powodu wysokiego chwilowego poboru prądu podczas nawiązywania połączenia z siecią GSM, należy dolutować do modułu kondensator o pojemności co najmniej 2000uF( zdjęcie poniżej).  Dodatkowo moduł powinien posiadać wersje  oprogramowania układowego [1418B05SIM800L24](https://letmeknow.fr/blog/wp-content/uploads/2018/01/1418B05SIM800L24.zip). Instrukcja aktualizacji oprogramowania jest pod [tym adresem](http://www.raviyp.com/learn-how-to-update-the-firmware-of-your-sim800-modules/). 
+* Moduł SIM800L EVB: z powodu wysokiego chwilowego poboru prądu podczas nawiązywania połączenia z siecią GSM, należy dolutować do modułu kondensator o pojemności co najmniej 2000uF( zdjęcie poniżej).  Dodatkowo moduł powinien posiadać wersje  oprogramowania układowego [1418B05SIM800L24](https://letmeknow.fr/blog/wp-content/uploads/2018/01/1418B05SIM800L24.zip). Instrukcja aktualizacji oprogramowania jest pod [tym adresem](http://www.raviyp.com/learn-how-to-update-the-firmware-of-your-sim800-modules/). 
 
 <p align="center">
   <img src="https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/11.jpg" width="300" title="SIM800L">
 </p>
 
-Moduł Wemos D1 Mini – prędkość przesyłu danych komunikacji szeregowej musi być ustawiona na 9600. Zmianę można dokonać poprzez komendę `AT+CIOBAUD=9600`.
+* Moduł Wemos D1 Mini – prędkość przesyłu danych komunikacji szeregowej musi być ustawiona na 9600. Zmianę można dokonać poprzez komendę `AT+CIOBAUD=9600`.
+
+* Przetwornica napięcia step-up MT3608 musi mieć ustawione napięcie wyjściowe na 5V.
 
 ## Schematy połączeń
 ![Wiring Power](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Wiring_Diagrams/Weather_Station_Wiring_Power.png)
