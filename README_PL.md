@@ -110,10 +110,10 @@ Po instalacji należy przejść do głównego folderu aplikacji i zalogować si�
 `$ heroku login`  
 Aplikację na serwerze tworzy się poleceniem  
 `$ heroku create example`  
-Gdzie example to nazwa naszej aplikacji. Aplikacja dostępna będzie pod adresem https://example.herokuapp.com/
+Gdzie `example` to nazwa naszej aplikacji. Aplikacja dostępna będzie pod adresem https://example.herokuapp.com/
 Dodajemy zdalne repozytorium Herocku poleceniem   
 `$ heroku git:remote -a example`  
-Gdzie example to nazwa naszej aplikacji  
+Gdzie `example` to nazwa naszej aplikacji  
 Na końcu zatwierdzamy zmiany i wysyłamy  
 `$ git add .`  
 `$ git commit -am "version 1.0"`  
