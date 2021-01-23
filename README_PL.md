@@ -8,6 +8,8 @@ Widok aplikacji             |  Widok urządzenia
 Projekt stacji pogodowej realizowany w ramach Projektu Inżynierskiego na Wydziale Matematyki i Informatyki Uniwersytetu im. Adama Mickiewicza w Poznaniu. Celem jest stworzenie stacji pogodowej opartej na 8-bitowym mikrokontrolerze wraz z aplikacją www do zbierania oraz prezentowania danych. Stacja będzie posiadać czujniki temperatury, wilgotności, ciśnienia oraz jakości powietrza.
 ## Zawartość
 
+<p align="center">
+
 folder/pliki           |  opis
 :-------------------------:|:-------------------------:
 Tests/ |	Testy oraz wyniki
@@ -20,6 +22,8 @@ client/	| Aplikacja internetowa React
 db/	| Schemat danych bazy danych oraz połączenie
 device/	| Oprogramowanie urządzenia
 index.js, app.js	| Aplikacja serwerowa Node JS
+
+</p>
 
 ## Urządzenie
 
