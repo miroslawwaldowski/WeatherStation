@@ -12,18 +12,18 @@
 /*If GSM is true, connect via GSM/GPRS, if false, connect via WiFi*/
 #define GSM_MODE true
 //Server info
-const char server[] PROGMEM = {"mwa-weather-station.herokuapp.com"};
+const char server[] PROGMEM = {"my-application-address.com"};
 int port = 80;
 const char url[] PROGMEM = {"/post"};
 //Wi-Fi
-const char ssid_WiFI[] PROGMEM = {"PLAY_ONLINE_2212"};
-const char password_WiFI[] PROGMEM = {"Zacisze1a5"};
+const char ssid_WiFI[] PROGMEM = {"my_wifi_ssid"};
+const char password_WiFI[] PROGMEM = {"my_wifi_password"};
 //GPRS APN - PLAY
 const char gprs_apn[] PROGMEM = {"\"INTERNET\""};
 //device info
-const char device_name[] PROGMEM = {"prototyp"};
-const char server_password[] PROGMEM = {"haslo"};
-//device height above sea level in in meters
+const char device_name[] PROGMEM = {"my_device_name"};
+const char server_password[] PROGMEM = {"my_device_password"};
+//device height above sea level in in meters for calculating relative pressure
 int height_above_sea_level = 80;
 //---------------------------------------------------------------
 
