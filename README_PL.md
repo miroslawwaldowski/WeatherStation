@@ -66,14 +66,16 @@ Zdjęcie zmontowanych elementów na płytce uniwersalnej zgodnie ze schematami p
 <img src="https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/05.jpg" width="600" title="">
 </p>
 
+Kolejne etapy montażu elementów w obudowie, pliki do druku obudowy znajduje się w folderze Weather_Station_STL_file a wizualizacja rozmieszczenia elementów w folderze Weather_Station_Visualisation.
+
 montaż anteny         |  montaż baterii
 :-------------------------:|:-------------------------:
 ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/01.jpg) |  ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/02.jpg)
 montaż ładowarki Li-Po            |  montaż przetwornicy napięcia
 ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/03.jpg) |  ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/04.jpg)
-montaż płytki z zamontowanymi elementami              |  montażczujnika UV
+montaż płytki z zamontowanymi elementami              |  montaż czujnika UV
 ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/06.jpg) |  ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/07.jpg)
-mpntaż panelu fotowoltaicznego            |  Widok urządzenia
+montaż panelu fotowoltaicznego            |  Widok urządzenia
 ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/09.jpg) |  ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/10.jpg)
 
 
