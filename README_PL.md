@@ -5,7 +5,7 @@ Widok aplikacji             |  Widok urządzenia
 ![main app](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/00.jpg) |  ![final view](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/10.jpg)
 
 ## Wstęp
-Projekt stacji pogodowej realizowany w ramach Projektu Inżynierskiego na Wydziale Matematyki i Informatyki Uniwersytetu im. Adama Mickiewicza w Poznaniu. Celem jest stworzenie stacji pogodowej opartej na 8-bitowym mikrokontrolerze wraz z aplikacją www do zbierania oraz prezentowania danych. Stacja będzie posiadać czujniki temperatury, wilgotności, ciśnienia oraz jakości powietrza.
+Projekt stacji pogodowej realizowany w ramach Projektu Inżynierskiego na Wydziale Matematyki i Informatyki Uniwersytetu im. Adama Mickiewicza w Poznaniu. Celem jest stworzenie stacji pogodowej opartej na 8-bitowym mikrokontrolerze wraz z aplikacją www do zbierania oraz prezentowania danych. Stacja będzie posiadać czujniki temperatury, wilgotności, ciśnienia, indeksu UV oraz jakości powietrza.
 ## Zawartość
 
 <p align="center">
@@ -32,7 +32,6 @@ index.js, app.js	| Aplikacja serwerowa Node JS
 *	moduł łączności:
     * GSM - SIM800L EVB lub  
     * WiFi - Wemos D1 Mini
-*	płyta Arduino Nano
 *	czujnik temperatury, wilgotności oraz ciśnienia BME280
 *	czujnik pyłu Nova Fitness SDS011
 *	czujnik UV GUVA-S12SD
@@ -143,7 +142,7 @@ Przed instalacją oprogramowania należy doinstalować do Arduino IDE biblioteki
 `int port = 80;`  
 // konfiguracja  Wi-Fi  
 `const char ssid_WiFI[] PROGMEM = {"TWOJA_NAZWA_SSID"};`  
-`const char password_WiFI[] PROGMEM = {"TWOJE_HASLO_DO WIFI"};`  
+`const char password_WiFI[] PROGMEM = {"TWOJE_HASLO_DO_WIFI"};`  
 // konfiguracja  APN GPRS sieci komórkowej  - PLAY  
 `const char gprs_apn[] PROGMEM = {"\"INTERNET\""};`  
 //konfiguracja danych tego urządzenia  
