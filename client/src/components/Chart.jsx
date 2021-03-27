@@ -340,7 +340,7 @@ const Chart = (props) => {
               className="btn"
               onClick={datasetFile.length > 0 ? getCSV : undefined}
             >
-              Downland
+              Download
             </button>
           </div>
           <div className="radio-button">
