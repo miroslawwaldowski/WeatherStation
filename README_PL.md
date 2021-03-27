@@ -5,7 +5,7 @@ Widok aplikacji             |  Widok urządzenia
 ![main app](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/00.jpg) |  ![final view](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/10.jpg)
 
 ## Wstęp
-Projekt stacji pogodowej realizowany w ramach Projektu Inżynierskiego na Wydziale Matematyki i Informatyki Uniwersytetu im. Adama Mickiewicza w Poznaniu. Celem jest stworzenie stacji pogodowej opartej na 8-bitowym mikrokontrolerze wraz z aplikacją www do zbierania oraz prezentowania danych. Stacja będzie posiadać czujniki temperatury, wilgotności, ciśnienia oraz jakości powietrza.
+Projekt stacji pogodowej realizowany w ramach Projektu Inżynierskiego na Wydziale Matematyki i Informatyki Uniwersytetu im. Adama Mickiewicza w Poznaniu. Celem jest stworzenie stacji pogodowej opartej na 8-bitowym mikrokontrolerze wraz z aplikacją www do zbierania oraz prezentowania danych. Stacja będzie posiadać czujniki temperatury, wilgotności, ciśnienia, indeksu UV oraz jakości powietrza.
 ## Zawartość
 
 <p align="center">
@@ -32,7 +32,6 @@ index.js, app.js	| Aplikacja serwerowa Node JS
 *	moduł łączności:
     * GSM - SIM800L EVB lub  
     * WiFi - Wemos D1 Mini
-*	płyta Arduino Nano
 *	czujnik temperatury, wilgotności oraz ciśnienia BME280
 *	czujnik pyłu Nova Fitness SDS011
 *	czujnik UV GUVA-S12SD
@@ -48,13 +47,15 @@ index.js, app.js	| Aplikacja serwerowa Node JS
 
 ## Uwagi do elementów urządzenia
 
-Moduł SIM800L EVB: z powodu wysokiego chwilowego poboru prądu podczas nawiązywania połączenia z siecią GSM, należy dolutować do modułu kondensator o pojemności co najmniej 2000uF( zdjęcie poniżej).  Dodatkowo moduł powinien posiadać wersje  oprogramowania układowego [1418B05SIM800L24](https://letmeknow.fr/blog/wp-content/uploads/2018/01/1418B05SIM800L24.zip). Instrukcja aktualizacji oprogramowania jest pod [tym adresem](http://www.raviyp.com/learn-how-to-update-the-firmware-of-your-sim800-modules/). 
+* Moduł SIM800L EVB: z powodu wysokiego chwilowego poboru prądu podczas nawiązywania połączenia z siecią GSM, należy dolutować do modułu kondensator o pojemności co najmniej 2000uF( zdjęcie poniżej).  Dodatkowo moduł powinien posiadać wersje  oprogramowania układowego [1418B05SIM800L24](https://letmeknow.fr/blog/wp-content/uploads/2018/01/1418B05SIM800L24.zip). Instrukcja aktualizacji oprogramowania jest pod [tym adresem](http://www.raviyp.com/learn-how-to-update-the-firmware-of-your-sim800-modules/). 
 
 <p align="center">
   <img src="https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/11.jpg" width="300" title="SIM800L">
 </p>
 
-Moduł Wemos D1 Mini – prędkość przesyłu danych komunikacji szeregowej musi być ustawiona na 9600. Zmianę można dokonać poprzez komendę `AT+CIOBAUD=9600`.
+* Moduł Wemos D1 Mini – prędkość przesyłu danych komunikacji szeregowej musi być ustawiona na 9600. Zmianę można dokonać poprzez komendę `AT+CIOBAUD=9600`.
+
+* Przetwornica napięcia step-up MT3608 musi mieć ustawione napięcie wyjściowe na 5V.
 
 ## Schematy połączeń
 ![Wiring Power](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Wiring_Diagrams/Weather_Station_Wiring_Power.png)
@@ -67,14 +68,16 @@ Zdjęcie zmontowanych elementów na płytce uniwersalnej zgodnie ze schematami p
 <img src="https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/05.jpg" width="600" title="">
 </p>
 
+Kolejne etapy montażu elementów w obudowie, pliki do druku obudowy znajduje się w folderze Weather_Station_STL_file a wizualizacja rozmieszczenia elementów w folderze Weather_Station_Visualisation.
+
 montaż anteny         |  montaż baterii
 :-------------------------:|:-------------------------:
 ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/01.jpg) |  ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/02.jpg)
 montaż ładowarki Li-Po            |  montaż przetwornicy napięcia
 ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/03.jpg) |  ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/04.jpg)
-montaż płytki z zamontowanymi elementami              |  montażczujnika UV
+montaż płytki z zamontowanymi elementami              |  montaż czujnika UV
 ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/06.jpg) |  ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/07.jpg)
-mpntaż panelu fotowoltaicznego            |  Widok urządzenia
+montaż panelu fotowoltaicznego            |  Widok urządzenia
 ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/09.jpg) |  ![](https://github.com/miroslawwaldowski/WeatherStation/blob/master/Weather_Station_Assembly_Images/10.jpg)
 
 
@@ -109,10 +112,10 @@ Po instalacji należy przejść do głównego folderu aplikacji i zalogować si�
 `$ heroku login`  
 Aplikację na serwerze tworzy się poleceniem  
 `$ heroku create example`  
-Gdzie example to nazwa naszej aplikacji. Aplikacja dostępna będzie pod adresem https://example.herokuapp.com/
+Gdzie `example` to nazwa naszej aplikacji. Aplikacja dostępna będzie pod adresem https://example.herokuapp.com/
 Dodajemy zdalne repozytorium Herocku poleceniem   
 `$ heroku git:remote -a example`  
-Gdzie example to nazwa naszej aplikacji  
+Gdzie `example` to nazwa naszej aplikacji  
 Na końcu zatwierdzamy zmiany i wysyłamy  
 `$ git add .`  
 `$ git commit -am "version 1.0"`  
@@ -143,7 +146,7 @@ Przed instalacją oprogramowania należy doinstalować do Arduino IDE biblioteki
 `int port = 80;`  
 // konfiguracja  Wi-Fi  
 `const char ssid_WiFI[] PROGMEM = {"TWOJA_NAZWA_SSID"};`  
-`const char password_WiFI[] PROGMEM = {"TWOJE_HASLO_DO WIFI"};`  
+`const char password_WiFI[] PROGMEM = {"TWOJE_HASLO_DO_WIFI"};`  
 // konfiguracja  APN GPRS sieci komórkowej  - PLAY  
 `const char gprs_apn[] PROGMEM = {"\"INTERNET\""};`  
 //konfiguracja danych tego urządzenia  
