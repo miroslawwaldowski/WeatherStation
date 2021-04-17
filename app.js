@@ -40,7 +40,7 @@ app.post("/post", async (req, res) => {
       [name]
     );
     if (foundDevice.rows.length === 0) {
-      res.json({ message: "Invalid device" });
+      res.json({ message: "Invalid device `name`"});
     } else {
       const validPassword = await bcrypt.compare(
         req.body.password,
